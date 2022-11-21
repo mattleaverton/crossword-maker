@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Crossword Maker</title>
+
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+</head>
+
+<body>
+    <main>
+        <div id="main-app"></div>
+    </main>
+
+    <script type="text/babel">
+        function Node(props) {
+            const { margin = 5 } = props;
+            const [hover, setHover] = React.useState(false);
+            const x = (props.col * props.size) + (margin * (props.col + 1))
+            const y = (props.row * props.size) + (margin * (props.row + 1))
+
+            return (
+                <>
+                    <rect x={x} y={y}
+                        width={props.size} height={props.size}
+                        fill={hover | props.hover ? "yellow" : "white"}
+                        onMouseEnter={() => setHover(true)}
+                        onMouseLeave={() => setHover(false)} />
+                    <text x={x + 20} y={y + 20}>{"(" + props.row + ", " + props.col + ")" }</text>
+                    <text x={x + 20} y={y + 40}>{props.char}</text>
+                </>
+            )
+        }
+
+        function Gameboard(props) {
+            const { blockSize = 100 } = props;
+            const state = props.gameState;
+
+            const nodes = state.map((row, row_index) => {
+                return row.map((node, col_index) => {
+                    return <Node size={blockSize}
+                        char={node}
+                        row={row_index} col={col_index}
+                        key={row_index.toString() + "," + col_index.toString()} />
+                });
+            });
+
+            return nodes
+        }
+
+        function Canvas(props) {
+            const { size = 5 } = props;
+            const gameState = Array(size).fill('.').map(x => Array(size).fill('.'))
+            // let gameState = [['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i']]
+
+            return (
+                <div className="container">
+                    <svg id="canvas" width="800" height="800" style={{ outline: "green solid 3px" }}>
+                        <rect width="800" height="800" fill="black" />
+                        <Gameboard gameState={gameState} />
+                    </svg>
+                </div>
+            )
+        }
+
+        const App = () => {
+            return (
+                <div>
+                    <Canvas />
+                </div>
+            )
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('main-app'))
+        root.render(<App />)
+    </script>
+</body>
+
+</html>
